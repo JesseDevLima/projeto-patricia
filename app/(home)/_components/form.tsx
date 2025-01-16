@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, FormEvent } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Card, CardContent, CardHeader } from "@/app/_components/ui/card";
 import { Button } from "@/app/_components/ui/button";
@@ -17,17 +17,19 @@ const formVariants = {
   exit: { opacity: 0, x: -20 },
 };
 
-const RegistrationForm = ({ initialData = {} }) => {
+const RegistrationForm: React.FC<{ initialData?: Record<string, any> }> = ({ initialData = {} }) => {
   const [formType, setFormType] = useState("cliente");
   const { toast } = useToast();
   const config = formConfigs[formType];
-
-  const handleSubmit = async (e) => {
+ //@ts-ignore
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const formData = new FormData(e.target);
+    const formData = new FormData(e.currentTarget);
+    //@ts-ignore
     const data = Object.fromEntries(formData.entries());
 
     const config = formConfigs[formType];
+    //@ts-ignore
     const allFields = [...config.fields.leftColumn];
 
     const requiredFields = allFields
@@ -47,7 +49,7 @@ const RegistrationForm = ({ initialData = {} }) => {
 
     try {
       await createRegistration({ type: formType, ...data });
-      e.target.reset();
+      e.currentTarget.reset();
       toast({
         title: "Sucesso",
         description: "Cadastro realizado com sucesso",
@@ -56,7 +58,7 @@ const RegistrationForm = ({ initialData = {} }) => {
     } catch (error) {
       toast({
         title: "Erro",
-        description: error.message || "Erro ao realizar cadastro",
+        description: error instanceof Error ? error.message : "Erro ao realizar cadastro",
         duration: 4000,
       });
       console.error("Error submitting form:", error);
