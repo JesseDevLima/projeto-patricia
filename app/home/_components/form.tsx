@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, FormEvent } from "react";
+import React, { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Card, CardContent, CardHeader } from "@/app/_components/ui/card";
 import { Button } from "@/app/_components/ui/button";
@@ -17,19 +17,17 @@ const formVariants = {
   exit: { opacity: 0, x: -20 },
 };
 
-const RegistrationForm: React.FC<{ initialData?: Record<string, any> }> = ({ initialData = {} }) => {
+const RegistrationForm = ({ initialData = {} }) => {
   const [formType, setFormType] = useState("cliente");
   const { toast } = useToast();
   const config = formConfigs[formType];
- //@ts-ignore
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-    //@ts-ignore
+    const formData = new FormData(e.target);
     const data = Object.fromEntries(formData.entries());
 
     const config = formConfigs[formType];
-    //@ts-ignore
     const allFields = [...config.fields.leftColumn];
 
     const requiredFields = allFields
@@ -49,7 +47,7 @@ const RegistrationForm: React.FC<{ initialData?: Record<string, any> }> = ({ ini
 
     try {
       await createRegistration({ type: formType, ...data });
-      e.currentTarget.reset();
+      e.target.reset();
       toast({
         title: "Sucesso",
         description: "Cadastro realizado com sucesso",
@@ -58,7 +56,7 @@ const RegistrationForm: React.FC<{ initialData?: Record<string, any> }> = ({ ini
     } catch (error) {
       toast({
         title: "Erro",
-        description: error instanceof Error ? error.message : "Erro ao realizar cadastro",
+        description: error.message || "Erro ao realizar cadastro",
         duration: 4000,
       });
       console.error("Error submitting form:", error);
