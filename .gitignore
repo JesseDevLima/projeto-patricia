@@ -35,3 +35,12 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Ignorar a pasta env
+env/
+
+# Ignorar o arquivo server.js
+server.js
+
+# Ignorar o arquivo middleware.ts
+middleware.ts
