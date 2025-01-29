@@ -4,18 +4,29 @@ import FormField from "./FormField";
 import { Input } from "@/app/_components/ui/input";
 import { Label } from "@/app/_components/ui/label";
 import { FormConfig } from "./types";
+import { useState } from "react";
+import { Button } from "@/app/_components/ui/button";
 
 type FormContentProps = {
   config: FormConfig;
   initialData?: Record<string, string>;
-  clientCod: Record<string, string>;
+  clientCod: { codigo: string };
+  onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
 };
 
 const FormContent = ({
   config,
   initialData,
-  clientCod = {},
+  clientCod,
+  onSubmit,
 }: FormContentProps) => {
+  const [reset, setReset] = useState(false);
+
+  const handleReset = () => {
+    setReset(true);
+    setTimeout(() => setReset(false), 0);
+  };
+
   const renderFields = (field: any) => {
     if (field.isRow) {
       return (
@@ -25,6 +36,7 @@ const FormContent = ({
               <FormField
                 field={subField}
                 defaultValue={initialData?.[subField.id]}
+                reset={reset}
               />
             </div>
           ))}
@@ -37,6 +49,7 @@ const FormContent = ({
         key={field.id}
         field={field}
         defaultValue={initialData?.[field.id]}
+        reset={reset}
       />
     );
   };
@@ -79,13 +92,13 @@ const FormContent = ({
       )}
 
       {config.clientLabel && (
-        <div className="flex items-center gap-2 ">
+        <div className="flex items-center gap-2">
           <Label htmlFor="codigo">{config.clientLabel}:</Label>
           <Input
             id="codigo"
             name="codigo"
-            value={clientCod.codigo} // Exibe o código no input
-            disabled // Desativa o campo
+            value={clientCod.codigo}
+            disabled
             className="w-14"
           />
         </div>
@@ -102,7 +115,6 @@ const FormContent = ({
           {config.fields.leftColumn.map(renderFields)}
         </motion.div>
 
-        {/* Campos extras se existirem */}
         {config.fields.extras && (
           <motion.div
             className="mt-4 flex items-center gap-4"
@@ -113,7 +125,6 @@ const FormContent = ({
           </motion.div>
         )}
 
-        {/* Campo de observações se existir */}
         {config.fields.obs && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
             <FormField
@@ -126,9 +137,20 @@ const FormContent = ({
                 value: "",
               }}
               defaultValue={initialData?.obs}
+              reset={reset}
             />
           </motion.div>
         )}
+      </div>
+
+      {/* Botões de ação */}
+      <div className="flex items-center justify-center gap-4">
+        <Button variant="outline" type="reset" onClick={handleReset}>
+          Limpar
+        </Button>
+        <Button type="submit" onClick={handleReset}>
+          Cadastrar
+        </Button>
       </div>
     </motion.div>
   );

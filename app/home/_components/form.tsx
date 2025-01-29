@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Card, CardContent, CardHeader } from "@/app/_components/ui/card";
@@ -26,7 +28,6 @@ const RegistrationForm = ({ initialData = {} }) => {
       const response = await fetch("/api/clientes/count"); // Endpoint para contar os clientes
       const totalClientes = await response.json();
       setCodigo((totalClientes + 1).toString()); // Define o próximo código
-      console.log("Código:", totalClientes + 1);
     } catch (error) {
       console.error("Erro ao buscar o código:", error);
     }
@@ -60,7 +61,12 @@ const RegistrationForm = ({ initialData = {} }) => {
     }
 
     try {
-      await createRegistration({ type: formType, codigo, ...data });
+      const dataToSend = {
+        type: formType,
+        ...data,
+        ...(formType === "cliente" && { codigo }),
+      };
+      await createRegistration(dataToSend);
       e.target.reset();
       toast({
         title: "Sucesso",
@@ -105,16 +111,10 @@ const RegistrationForm = ({ initialData = {} }) => {
                   config={config}
                   initialData={initialData}
                   clientCod={{ codigo: codigo }}
+                  onSubmit={handleSubmit} // Passando a função
                 />
               </motion.div>
             </AnimatePresence>
-
-            <div className="flex items-center justify-center gap-4">
-              <Button variant="outline" type="reset">
-                Limpar
-              </Button>
-              <Button type="submit">Cadastrar</Button>
-            </div>
           </form>
         </CardContent>
       </Card>
